@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "528859843791",
+    "project_id": "wasteless-8714b",
+    "storage_bucket": "wasteless-8714b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528859843791:android:0a96e08a9084ced0b7fbba",
+        "android_client_info": {
+          "package_name": "com.arise.kitchenos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnX7Jno6LUH7dhcik49ItSCB4-M5js1KM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528859843791:android:661067a8035109a7b7fbba",
+        "android_client_info": {
+          "package_name": "com.arise.smartkitchenai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnX7Jno6LUH7dhcik49ItSCB4-M5js1KM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
