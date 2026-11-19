@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SmartKitchen chef-hat logo. Tinted at runtime; base colour is the brand green. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Puffy top -->
+    <path
+        android:fillColor="#46704F"
+        android:pathData="M13,30 C7,30 4,24 7.5,20 C5,13 12,8 18,10.5 C20,5 28,5 30,10.5 C36,8 43,13 40.5,20 C44,24 41,30 35,30 Z" />
+    <!-- Band -->
+    <path
+        android:fillColor="#46704F"
+        android:pathData="M13,32 L35,32 L35,39 C35,40.66 33.66,42 32,42 L16,42 C14.34,42 13,40.66 13,39 Z" />
+    <!-- Band highlight line -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.85"
+        android:pathData="M17,36 L31,36 L31,37.5 L17,37.5 Z" />
+</vector>

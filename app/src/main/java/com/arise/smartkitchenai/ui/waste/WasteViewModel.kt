@@ -7,9 +7,12 @@ import com.arise.smartkitchenai.data.KitchenRepository
 import com.arise.smartkitchenai.data.WasteEntry
 import com.arise.smartkitchenai.data.WasteReason
 import com.arise.smartkitchenai.util.Dates
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -21,10 +24,17 @@ data class WasteUiState(
     val topReason: WasteReason? = null,
 )
 
-class WasteViewModel(private val repository: KitchenRepository) : ViewModel() {
+/** Manager's waste log for this device's branch. */
+@OptIn(ExperimentalCoroutinesApi::class)
+class WasteViewModel(
+    private val repository: KitchenRepository,
+    branchId: StateFlow<Long>,
+) : ViewModel() {
 
     val uiState: StateFlow<WasteUiState> =
-        combine(repository.wasteEntries, repository.ingredients) { entries, ingredients ->
+        branchId.flatMapLatest { branch ->
+            combine(repository.wasteEntries(branch), repository.ingredients(branch)) { e, i -> e to i }
+        }.map { (entries, ingredients) ->
             val today = Dates.todayEpochDay()
             val last30 = entries.filter { it.epochDay > today - 30 }
             WasteUiState(

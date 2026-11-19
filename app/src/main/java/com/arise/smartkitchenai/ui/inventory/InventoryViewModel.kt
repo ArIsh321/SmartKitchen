@@ -7,11 +7,13 @@ import com.arise.smartkitchenai.data.Ingredient
 import com.arise.smartkitchenai.data.KitchenRepository
 import com.arise.smartkitchenai.data.isLowStock
 import com.arise.smartkitchenai.data.stockValue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,12 +31,17 @@ sealed interface ScanState {
     data class Done(val result: BarcodeResult) : ScanState
 }
 
-class InventoryViewModel(private val repository: KitchenRepository) : ViewModel() {
+/** Manager's inventory for this device's branch. */
+@OptIn(ExperimentalCoroutinesApi::class)
+class InventoryViewModel(
+    private val repository: KitchenRepository,
+    private val branchId: StateFlow<Long>,
+) : ViewModel() {
 
     private val query = MutableStateFlow("")
 
     val uiState: StateFlow<InventoryUiState> =
-        combine(repository.ingredients, query) { all, q ->
+        combine(branchId.flatMapLatest { repository.ingredients(it) }, query) { all, q ->
             val filtered = if (q.isBlank()) all else all.filter {
                 it.name.contains(q, ignoreCase = true) || it.category.contains(q, ignoreCase = true)
             }
@@ -56,7 +63,9 @@ class InventoryViewModel(private val repository: KitchenRepository) : ViewModel(
     }
 
     fun save(ingredient: Ingredient) {
-        viewModelScope.launch { repository.saveIngredient(ingredient) }
+        // New ingredients belong to this device's branch.
+        val toSave = if (ingredient.id == 0L) ingredient.copy(branchId = branchId.value) else ingredient
+        viewModelScope.launch { repository.saveIngredient(toSave) }
     }
 
     fun delete(ingredient: Ingredient) {
@@ -69,7 +78,7 @@ class InventoryViewModel(private val repository: KitchenRepository) : ViewModel(
 
     fun onBarcodeScanned(barcode: String) {
         _scanState.value = ScanState.LookingUp
-        viewModelScope.launch { _scanState.value = ScanState.Done(repository.lookupBarcode(barcode)) }
+        viewModelScope.launch { _scanState.value = ScanState.Done(repository.lookupBarcode(barcode, branchId.value)) }
     }
 
     /** Call once the UI has applied the scan result. */

@@ -7,8 +7,10 @@ import com.arise.smartkitchenai.data.KitchenRepository
 import com.arise.smartkitchenai.data.WasteReason
 import com.arise.smartkitchenai.data.stockValue
 import com.arise.smartkitchenai.util.Dates
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -28,10 +30,15 @@ data class ExpiryUiState(
     val valueAtRisk: Double = 0.0,
 )
 
-class ExpiryViewModel(private val repository: KitchenRepository) : ViewModel() {
+/** Manager's expiry tracker for this device's branch. */
+@OptIn(ExperimentalCoroutinesApi::class)
+class ExpiryViewModel(
+    private val repository: KitchenRepository,
+    branchId: StateFlow<Long>,
+) : ViewModel() {
 
     val uiState: StateFlow<ExpiryUiState> =
-        repository.ingredients.map { ingredients ->
+        branchId.flatMapLatest { repository.ingredients(it) }.map { ingredients ->
             val today = Dates.todayEpochDay()
             val items = ingredients
                 .filter { it.expiryEpochDay != null && it.quantity > 0 }

@@ -27,6 +27,10 @@ object Dates {
 
 fun Double.asMoney(): String = NumberFormat.getCurrencyInstance().format(this)
 
+/** Money without decimals, for headline numbers (e.g. "$48,620"). */
+fun Double.asMoneyWhole(): String =
+    NumberFormat.getCurrencyInstance().apply { maximumFractionDigits = 0; minimumFractionDigits = 0 }.format(this)
+
 fun Double.asQuantity(): String =
     if (this % 1.0 == 0.0) toLong().toString()
     else String.format(Locale.getDefault(), "%.2f", this).trimEnd('0').trimEnd('.', ',')
